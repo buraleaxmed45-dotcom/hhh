@@ -127,11 +127,15 @@ export default function App() {
               name: file.name
             });
             const shareUrl = `${window.location.origin}${window.location.pathname}?imgId=${docRef.id}`;
+
             setUtilInput(shareUrl);
             setError("Sawirka waa la cadaadiyey oo la kaydiyey! QR Code-kani waa link-ga sawirkaaga.");
-          } catch (err) {
+          } catch (err: any) {
             console.error(err);
-            setError("Waan ka xunnahay, sawirka wali waa weyn yahay.");
+            const errorMsg = err?.code === 'permission-denied' 
+              ? "Firebase Permission Denied: Hubi Authorized Domains!" 
+              : `Cillad: ${err?.message || 'Lama yaqaan'}`;
+            setError(errorMsg);
           } finally {
             setIsUploading(false);
           }

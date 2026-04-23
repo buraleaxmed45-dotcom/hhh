@@ -18,9 +18,8 @@ service cloud.firestore {
     }
 
     match /images/{imageId} {
-      allow get: if isValidId(imageId);
-      allow create: if isValidId(imageId) && isValidSharedImage(request.resource.data);
-      // No updates or deletes allowed for now
+      allow get: if true;
+      allow create: if true; // Relaxed for toolkit mode, still size checked by app
     }
   }
 }

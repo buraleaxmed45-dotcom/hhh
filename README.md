@@ -1,20 +1,30 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Sentinel-X QR Share 🚀
 
-# Run and deploy your AI Studio app
+App kan wuxuu kuu ogolaanayaa inaad sawiradaada u beddesho QR Code share-garaysan. Waa mid aad u fudud oo diiradda saaraysa sirta iyo xawaaraha.
 
-This contains everything you need to run your app locally.
+## Sifooyinka (Features)
+- **Image to QR**: Soo geli sawir kasta, waxaadna helaysaa QR Code link-ga sawirkaas ah.
+- **QR Scanner**: Haddii sawirka aad soo gelisay uu leeyahay QR Code (sida config-yada v2ray), wuu aqrinayaa.
+- **Cloud Powered**: Sawirada waxaa lagu kaydiyaa Firebase Firestore si ammaan ah.
+- **Fast UI**: Waxaa lagu dhisay React iyo Tailwind CSS.
 
-View your app in AI Studio: https://ai.studio/apps/deee11e3-4077-4edf-abfe-20cb1f2283e3
+## Sida loo isticmaalo (Usage)
+1. Soo geli sawirka aad rabto inaad share-garayso.
+2. App-ku wuxuu kuu dhalinayaa QR Code iyo Link share-garaysan.
+3. QR Code-kaas u dir asxaabtaada si ay u arkaan sawirka.
 
-## Run Locally
+## Rakibaadda (Installation)
+Haddii aad rabto inaad adiga dhisato nuqul ka mid ah app-kan:
 
-**Prerequisites:**  Node.js
+1. Clone me: `git clone https://github.com/username/project-name.git`
+2. Install tools: `npm install`
+3. Start: `npm run dev`
 
+## Tiknoolajiyada (Tech Stack)
+- **Frontend**: React + Vite
+- **Styling**: Tailwind CSS + Framer Motion
+- **Icons**: Lucide React
+- **Backend**: Firebase Firestore
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+---
+© 2026 Sentinel-X // QR-SHARE
