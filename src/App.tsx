@@ -20,11 +20,14 @@ import { QRCodeSVG } from 'qrcode.react';
 import jsQR from 'jsqr';
 import { initializeApp } from 'firebase/app';
 import { getFirestore, collection, addDoc, doc, getDoc, serverTimestamp } from 'firebase/firestore';
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, User } from 'firebase/auth';
 import firebaseConfig from '../firebase-applet-config.json';
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
+const auth = getAuth(app);
+const googleProvider = new GoogleAuthProvider();
 
 export default function App() {
   const [utilInput, setUtilInput] = useState('');
@@ -34,8 +37,19 @@ export default function App() {
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [sharedImage, setSharedImage] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const isDev = typeof window !== 'undefined' && window.location.hostname.includes('ais-dev');
 
   useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+
+    if (!firebaseConfig.apiKey) {
+      setError("Cillad: Maqaayadda Firebase lama helin. Fadlan hubi setup-kaaga.");
+      return;
+    }
+
     fetch('https://api.ipify.org?format=json')
       .then(res => res.json())
       .then(data => setPublicIp(data.ip))
@@ -49,7 +63,7 @@ export default function App() {
         try {
           const docRef = doc(db, 'images', imgId);
           const docSnap = await getDoc(docRef);
-          if (docSnap.exists()) {
+          if (docSnap.exists() && docSnap.data()?.base64) {
             setSharedImage(docSnap.data().base64);
           } else {
             setError("Sawirka lama helin ama waa la tirtiray.");
@@ -71,6 +85,23 @@ export default function App() {
       link.download = `sentinel-qr-${Date.now()}.png`;
       link.href = url;
       link.click();
+    }
+  };
+
+  const handleLogin = async () => {
+    try {
+      await signInWithPopup(auth, googleProvider);
+    } catch (err) {
+      console.error(err);
+      setError("Cillad ayaa dhacday markii la login-garaynayey.");
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -124,7 +155,8 @@ export default function App() {
             const docRef = await addDoc(collection(db, 'images'), {
               base64: compressedDataUrl,
               createdAt: serverTimestamp(),
-              name: file.name
+              name: file.name,
+              userId: user?.uid || 'anonymous'
             });
             const shareUrl = `${window.location.origin}${window.location.pathname}?imgId=${docRef.id}`;
 
@@ -177,7 +209,23 @@ export default function App() {
             </div>
           </div>
 
-          <div className="flex bg-black/40 p-1 rounded-xl border border-white/5 w-full sm:w-auto">
+          <div className="flex flex-col sm:flex-row items-center gap-4 bg-black/40 p-1 rounded-xl border border-white/5 w-full sm:w-auto">
+            {user ? (
+              <div className="flex items-center gap-3 px-3 py-1 pr-4 bg-white/5 rounded-lg border border-white/5">
+                <img src={user.photoURL || ''} alt="User" className="w-6 h-6 rounded-full border border-cyan-500/30" />
+                <div className="flex flex-col">
+                  <span className="text-[10px] font-black text-white uppercase leading-none">{user.displayName}</span>
+                  <button onClick={handleLogout} className="text-[8px] text-red-500 hover:text-white uppercase font-bold text-left">Logout</button>
+                </div>
+              </div>
+            ) : (
+              <button 
+                onClick={handleLogin}
+                className="px-6 py-2 rounded-lg text-xs font-black bg-white/5 text-cyan-500 tracking-widest uppercase hover:bg-white/10 transition-all border border-white/5"
+              >
+                Login with Google
+              </button>
+            )}
             <div className="px-6 py-2 rounded-lg text-xs font-black bg-cyan-500 text-black tracking-widest uppercase shadow-[0_0_20px_rgba(34,211,238,0.3)]">
               Toolkit Mode
             </div>
@@ -209,7 +257,16 @@ export default function App() {
                       <QrCode size={32} className="hidden sm:block" />
                     </div>
                     <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight mb-2 uppercase text-center">Toolkit</h2>
-                    <p className="text-[10px] sm:text-xs text-slate-500 mb-8 sm:mb-10 mono text-center max-w-sm italic">Soo geli sawir kasta si uu link kuugu dhalisto.</p>
+                    <p className="text-[10px] sm:text-xs text-slate-500 mb-4 mono text-center max-w-sm italic">Soo geli sawir kasta si uu link kuugu dhalisto.</p>
+                    
+                    {isDev && (
+                      <div className="mb-6 p-2 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
+                        <p className="text-[9px] text-yellow-500 font-bold uppercase tracking-tighter">
+                          ⚠️ Waxaad ku jirtaa Dev Mode. QR-ka halkan lagu dhalo dadka kale uma shaqaynayo. 
+                          Fadlan app-ka ka fur link-gaaga production-ka ee Vercel.
+                        </p>
+                      </div>
+                    )}
                     
                     <div className="w-full relative">
                       <input 
