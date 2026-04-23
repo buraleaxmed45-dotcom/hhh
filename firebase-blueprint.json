@@ -1,0 +1,21 @@
+{
+  "entities": {
+    "SharedImage": {
+      "title": "SharedImage",
+      "description": "An image shared via QR code",
+      "type": "object",
+      "properties": {
+        "base64": { "type": "string", "description": "The base64 representation of the image" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "name": { "type": "string" }
+      },
+      "required": ["base64", "createdAt"]
+    }
+  },
+  "firestore": {
+    "images/{imageId}": {
+      "schema": "SharedImage",
+      "description": "Store shared images"
+    }
+  }
+}

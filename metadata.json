@@ -1,0 +1,6 @@
+{
+  "name": "VMess Link Inspector",
+  "description": "Decode and analyze VMess configuration links with a clean, technical interface.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
